@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Stock;
+use App\Models\WorkOrderUnifi;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Illuminate\Contracts\View\View;
@@ -22,24 +22,23 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style;
 use PhpOffice\PhpSpreadsheet\Style\Style as DefaultStyles;
 
-class ExportStock implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, ShouldAutoSize
+class ExportOrder implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, ShouldAutoSize
 {
+
     use Exportable;
 
     protected $index = 0;
-
     /**
     * @return \Illuminate\Support\Collection
     */
-
     public function collection()
     {
         $parsedUrl = parse_url(str_replace(url('/'), '', url()->previous()));
-        $Stock = Stock::query();
+        $order = WorkOrderUnifi::query();
 
         if (empty($parsedUrl['query'])) {
             $test = 'no data';
-            $Stock = $Stock->get();
+            $order = $order->get();
         } else {
             $test = $parsedUrl['query'];
 
@@ -47,50 +46,45 @@ class ExportStock implements FromCollection, WithHeadings, WithMapping, WithStyl
             if (!empty($output['filter'])) {
                 $filter = $output['filter'];
 
-                $Stock = $Stock->where(function ($query) use ($filter) {
-                    $query->where('batch', 'LIKE', '%' . ($filter['batch'] ?? '') . '%')
-                        ->where('material_no', 'LIKE', '%' . ($filter['material_no'] ?? '') . '%')
-                        ->where('description', 'LIKE', '%' . ($filter['description'] ?? '') . '%')
-                        ->where('serial_no', 'LIKE', '%' . ($filter['serial_no'] ?? '') . '%')
-                        ->where('equipment_status', 'LIKE', '%' . ($filter['equipment_status'] ?? '') . '%')
-                        ->where('valuation_type', 'LIKE', '%' . ($filter['valuation_type'] ?? '') . '%')
-                        ->where('reason', 'LIKE', '%' . ($filter['reason'] ?? '') . '%')
-                        ->where('aging', 'LIKE', '%' . ($filter['aging'] ?? '') . '%')
-                        ->where('remark', 'LIKE', '%' . ($filter['remark'] ?? '') . '%');;
+                $order = $order->where(function ($query) use ($filter) {
+                    $query->where('order_no', 'LIKE', '%' . ($filter['order_no'] ?? '') . '%')
+                        ->where('team_id', 'LIKE', '%' . ($filter['team_id'] ?? '') . '%')
+                        ->where('transaction_type', 'LIKE', '%' . ($filter['transaction_type'] ?? '') . '%')
+                        ->where('source_system', 'LIKE', '%' . ($filter['source_system'] ?? '') . '%')
+                        ->where('consumption_type', 'LIKE', '%' . ($filter['consumption_type'] ?? '') . '%')
+                        ->where('exchange_code', 'LIKE', '%' . ($filter['exchange_code'] ?? '') . '%')
+                        ->where('segment_group', 'LIKE', '%' . ($filter['segment_group'] ?? '') . '%')
+                        ->where('batch', 'LIKE', '%' . ($filter['batch'] ?? '') . '%')
+                        ->where('remarks', 'LIKE', '%' . ($filter['remarks'] ?? '') . '%');;
                 });
-                $Stock = $Stock->select('batch','material_no','description','serial_no','equipment_status','valuation_type','reason', 'aging', 'installation_order_no', 'installation_date', 'updated_at', 'warranty_start', 'warranty_end', 'remark');
-                $Stock = $Stock->get();
+                $order = $order->get();
             } else {
-                $Stock = $Stock->get();
+                $order = $order->get();
             }
         }
 
-        return $Stock;
+        return $order;
     }
 
     public function map($row): array {
         return [
             ++$this->index,
+            $row['order_no'],
+            $row['team_id'],
+            $row['transaction_type'],
+            $row['source_system'],
+            $row['consumption_type'],
+            $row['exchange_code'],
+            $row['segment_group'],
             $row['batch'],
-            $row['material_no'],
-            $row['description'],
-            $row['serial_no'],
-            $row['equipment_status'],
-            $row['valuation_type'],
-            $row['reason'],
-            $row['aging'],
-            $row['installation_order_no'],
-            $row['installation_date'],
-            $row['updated_at'],
-            $row['warranty_start'],
-            $row['warranty_end'],
-            $row['remark'],
+            $row['date_transferred'],
+            $row['remarks'],
         ];
     }
 
     public function headings(): array
     {
-        return ["#", "Batch", "Material No", "Description", "Serial No", "Equipment Status", "Valuation Type", "Reason", "AGING STATUS", "INSTALLATION ORDER NO", "INSTALLATION DATE", "Last edit", "Warranty Start Date", "Warranty End Date", "remark"];
+        return ["#", "Order No.", "Team ID No", "Transaction Type", "Source System", "Consumption Type", "Exchange Code", "Segment Group", "Batch", "DATE TRANSFERRED", "Remark"];
     }
 
     public function columnWidths(): array {

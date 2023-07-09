@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\OrderImport;
-//use App\Exports\ExportStock;
+use App\Exports\ExportOrder;
 use App\Models\WorkOrderUnifi;
 use App\Models\Stock;
 use Orchid\Filters;
@@ -69,6 +69,6 @@ class OrderImportExportController extends Controller
 
     public function export(Request $request){
         $date = Carbon::now();
-        //return Excel::download(new ExportStock, 'order'.$date.'.xlsx');
+        return Excel::download(new ExportOrder, 'order'.$date.'.xlsx');
     }
 }

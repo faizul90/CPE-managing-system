@@ -80,11 +80,13 @@ class ImportStock implements ToModel, WithHeadingRow
     private function convertToDatabaseDateFormat($date)
     {
         $date = trim($date); // Remove leading/trailing spaces
-        
+
         if (is_numeric($date)) {
             return ExcelDate::excelToDateTimeObject($date)->format('Y-m-d H:i:s');
+        } elseif ($date != null) {
+            // If the date matches the 'Y-m-d H:i:s' format, return the same format
+            return $date;
         } else {
-            
             return null;
         }
     }

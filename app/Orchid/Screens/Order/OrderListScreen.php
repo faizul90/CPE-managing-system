@@ -56,6 +56,10 @@ class OrderListScreen extends Screen
     public function commandBar(): iterable
     {
         return [
+            Link::make('Download')
+                ->icon('bs.download')
+                ->method('get')
+                ->route('platform.order.export'),
             ModalToggle::make(__('Import Excel'))
                 ->icon('bs.plus-circle')
                 ->modal('asyncImportOrderModal')
