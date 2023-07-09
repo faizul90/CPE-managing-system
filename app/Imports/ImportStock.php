@@ -41,21 +41,22 @@ class ImportStock implements ToModel, WithHeadingRow
         $currentTime = Carbon::now();
 
         $existingStock = Stock::where('serial_no', $row['serial_no'])->first();
-
+        
         if ($existingStock) {
+            
             $existingStockWarrantyStart = $this->convertToDatabaseDateFormat($existingStock->warranty_start);
             $existingStockWarrantyEnd = $this->convertToDatabaseDateFormat($existingStock->warranty_end);
-
-            if ($existingStockWarrantyStart === $warranty_start && $existingStockWarrantyEnd === $warranty_end) {
-                return null; // Skip insertion if the date values are the same as in the database
-            }
-
             $existingStock->updated_at = $currentTime;
             $existingStock->batch = $row['batch'];
-            $existingStock->warranty_start = $warranty_start;
-            $existingStock->warranty_end = $warranty_end;
 
-            return $existingStock; // Update insertion if serial_no already exists
+            if ($existingStockWarrantyStart === $warranty_start && $existingStockWarrantyEnd === $warranty_end && $row['remark'] = '') {
+                return null; // Skip insertion if the date values are the same as in the database
+            }else{
+                $existingStock->warranty_start = $warranty_start;
+                $existingStock->warranty_end = $warranty_end;
+            }
+            
+            return $existingStock;// Update insertion if serial_no already exists
         } else {
             return new Stock([
                 'batch' => $row['batch'],
@@ -83,7 +84,8 @@ class ImportStock implements ToModel, WithHeadingRow
         if (is_numeric($date)) {
             return ExcelDate::excelToDateTimeObject($date)->format('Y-m-d H:i:s');
         } else {
-            return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
+            
+            return null;
         }
     }
 }

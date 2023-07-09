@@ -91,4 +91,11 @@ class OrderListScreen extends Screen
     {
         return OrderImportExportController::import($request->all());
     }
+
+    public function remove(Request $request): void
+    {
+        WorkOrderUnifi::findOrFail($request->get('id'))->delete();
+
+        Toast::info(__('Order was removed'));
+    }
 }

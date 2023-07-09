@@ -34,11 +34,18 @@ class StockImportExportController extends Controller
             $updatedStocks = Stock::whereIn('serial_no', $serials)->get();
 
             foreach ($rows[0] as $row) {
+
                 $stock = Stock::where('serial_no', $row['serial_no'])->first();
+
                 if ($stock) {
-                    if($row['equipment_status'] = 'NEW' && $row['remark'] = 'NOT UPDATE'){
-                        $stock->remark = '';
+                    if(isset($row['remark'])){
+                        if($row['equipment_status'] === 'NEW' && $row['remark'] === 'NOT UPDATE'){
+                            $stock->remark = '';
+                        }else{
+                            $stock->remark = $row['remark'];
+                        }
                     }
+                    
                     $stock->batch = $row['batch'];
                     $stock->save();
                 }

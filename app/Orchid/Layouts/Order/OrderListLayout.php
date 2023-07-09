@@ -85,6 +85,21 @@ class OrderListLayout extends Table
                 ->sort()
                 ->filter(Input::make())
                 ->render(fn (WorkOrderUnifi $items) => $items->remarks),
+
+            TD::make(__('Actions'))
+                ->align(TD::ALIGN_CENTER)
+                ->width('100px')
+                ->render(fn (WorkOrderUnifi $items) => DropDown::make()
+                    ->icon('bs.three-dots-vertical')
+                    ->list([
+
+                        Button::make(__('Delete'))
+                            ->icon('bs.trash3')
+                            ->confirm(__('Once the account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.'))
+                            ->method('remove', [
+                                'id' => $items->id,
+                            ]),
+                    ])),
         ];
     }
 }
