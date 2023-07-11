@@ -38,11 +38,11 @@ class StockImportExportController extends Controller
                 $stock = Stock::where('serial_no', $row['serial_no'])->first();
 
                 if ($stock) {
-                    if(isset($row['remark'])){
-                        if($row['equipment_status'] === 'NEW' && $row['remark'] === 'NOT UPDATE'){
-                            $stock->remark = '';
+                    if(isset($row['status'])){
+                        if($row['equipment_status'] === 'NEW' && $row['status'] === 'NOT UPDATE'){
+                            $stock->status = '';
                         }else{
-                            $stock->remark = $row['remark'];
+                            $stock->status = $row['status'];
                         }
                     }
                     
@@ -54,23 +54,23 @@ class StockImportExportController extends Controller
             $notUpdatedStocks = Stock::whereNotIn('serial_no', $serials)->get();
 
             foreach ($notUpdatedStocks as $stock) {
-                $remark = '';
+                $status = '';
 
                 switch ($stock->equipment_status) {
                     case 'NEW':
-                        $remark = 'NOT UPDATE';
+                        $status = 'NOT UPDATE';
                         break;
                     case 'INSTALLED':
-                        $remark = 'DONE';
+                        $status = 'DONE';
                         break;
                     case 'PENALTY':
                     case 'DOA':
-                        $remark = 'REMOVE IN TM SYSTEM';
+                        $status = 'REMOVE IN TM SYSTEM';
                         break;
                 }
 
-                if ($remark !== '') {
-                    $stock->remark = $remark;
+                if ($status !== '') {
+                    $stock->status = $status;
                     $stock->save();
                 }
             }

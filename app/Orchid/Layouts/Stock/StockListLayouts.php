@@ -96,6 +96,11 @@ class StockListLayouts extends Table
                 ->filter(Input::make())
                 ->render(fn (Stock $stock) => $stock->updated_at),
 
+            TD::make('status', __('STATUS'))
+                ->sort()
+                ->filter(Input::make())
+                ->render(fn (Stock $stock) => $stock->status),
+
             TD::make('remark', __('REMARK'))
                 ->sort()
                 ->filter(Input::make())

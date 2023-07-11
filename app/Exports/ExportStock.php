@@ -66,10 +66,19 @@ class ExportStock implements FromCollection, WithHeadings, WithMapping, WithStyl
                                     ->orWhereNull('remark');
                                 }
                                 
+                            })
+                            ->where(function ($query) use ($filter) {
+                                if(isset($filter['status'])){
+                                    $query->where('status', 'LIKE', '%' . ($filter['status'] ?? '') . '%');
+                                }else{
+                                    $query->where('status', 'LIKE', '%' .'' . '%')
+                                    ->orWhereNull('status');
+                                }
+                                
                             });
                     });
 
-                    $stock = $stock->select('batch', 'material_no', 'description', 'serial_no', 'equipment_status', 'valuation_type', 'reason', 'aging', 'installation_order_no', 'installation_date', 'updated_at', 'warranty_start', 'warranty_end', 'remark')->get();
+                    $stock = $stock->select('batch', 'material_no', 'description', 'serial_no', 'equipment_status', 'valuation_type', 'reason', 'aging', 'installation_order_no', 'installation_date', 'updated_at', 'warranty_start', 'warranty_end', 'remark', 'status')->get();
                 } else {
                     $stock = $stock->get();
                 }
@@ -100,13 +109,14 @@ class ExportStock implements FromCollection, WithHeadings, WithMapping, WithStyl
             $row['updated_at'],
             $row['warranty_start'],
             $row['warranty_end'],
+            $row['status'],
             $row['remark'],
         ];
     }
 
     public function headings(): array
     {
-        return ["#", "Batch", "Material No", "Description", "Serial No", "Equipment Status", "Valuation Type", "Reason", "AGING STATUS", "INSTALLATION ORDER NO", "INSTALLATION DATE", "Last edit", "Warranty Start Date", "Warranty End Date", "remark"];
+        return ["#", "Batch", "Material No", "Description", "Serial No", "Equipment Status", "Valuation Type", "Reason", "AGING STATUS", "INSTALLATION ORDER NO", "INSTALLATION ORDER DATE", "Last edit", "Warranty Start Date", "Warranty End Date", "STATUS", "remark"];
     }
 
     public function columnWidths(): array {

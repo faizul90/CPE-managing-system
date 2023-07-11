@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('exchange_code')->nullable();
             $table->string('segment_group')->nullable();
             $table->string('batch')->nullable();
+            $table->string('status')->nullable();
             $table->string('remarks')->nullable();
             $table->timestamps();
         });

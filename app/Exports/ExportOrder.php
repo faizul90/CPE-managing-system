@@ -47,16 +47,18 @@ class ExportOrder implements FromCollection, WithHeadings, WithMapping, WithStyl
                 $filter = $output['filter'];
 
                 $order = $order->where(function ($query) use ($filter) {
-                    $query->where('order_no', 'LIKE', '%' . ($filter['order_no'] ?? '') . '%')
-                        ->where('team_id', 'LIKE', '%' . ($filter['team_id'] ?? '') . '%')
-                        ->where('transaction_type', 'LIKE', '%' . ($filter['transaction_type'] ?? '') . '%')
-                        ->where('source_system', 'LIKE', '%' . ($filter['source_system'] ?? '') . '%')
-                        ->where('consumption_type', 'LIKE', '%' . ($filter['consumption_type'] ?? '') . '%')
-                        ->where('exchange_code', 'LIKE', '%' . ($filter['exchange_code'] ?? '') . '%')
-                        ->where('segment_group', 'LIKE', '%' . ($filter['segment_group'] ?? '') . '%')
-                        ->where('batch', 'LIKE', '%' . ($filter['batch'] ?? '') . '%')
-                        ->where('remarks', 'LIKE', '%' . ($filter['remarks'] ?? '') . '%');;
+                    foreach ($filter as $key => $value) {
+                        $query->where(function ($query) use ($key, $value) {
+                            if (isset($value)) {
+                                $query->where($key, 'LIKE', '%' . $value . '%');
+                            } else {
+                                $query->where($key, 'LIKE', '%' . '' . '%')
+                                    ->orWhereNull($key);
+                            }
+                        });
+                    }
                 });
+
                 $order = $order->get();
             } else {
                 $order = $order->get();
@@ -114,4 +116,5 @@ class ExportOrder implements FromCollection, WithHeadings, WithMapping, WithStyl
             ],
         ];
     }
+
 }

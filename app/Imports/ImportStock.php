@@ -68,10 +68,11 @@ class ImportStock implements ToModel, WithHeadingRow
                 'reason' => $row['reason'],
                 'aging' => $aging,
                 'installation_order_no' => $row['installation_order_no'],
-                'installation_date' => $row['installation_date'],
+                'installation_date' => $row['installation_order_date'],
                 'warranty_start' => $warranty_start,
                 'warranty_end' => $warranty_end,
                 'updated_at' => $currentTime->toDateTimeString(),
+                'status' => '',
                 'remark' => '',
             ]);
         }

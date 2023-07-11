@@ -47,6 +47,12 @@ class OrderEditLayout extends Rows
                 ->max(255)
                 ->title(__('Transaction Type'))
                 ->placeholder(__('Transaction Type')),
+
+            Input::make('order.remarks')
+                ->type('text')
+                ->max(255)
+                ->title(__('Remark'))
+                ->placeholder(__('Remark')),
         ];
     }
 }

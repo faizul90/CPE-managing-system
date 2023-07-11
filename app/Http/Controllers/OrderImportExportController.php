@@ -51,7 +51,7 @@ class OrderImportExportController extends Controller
                 Stock::whereIn('serial_no', $serialNumbers)
                     ->update([
                         'equipment_status' => 'INSTALLED',
-                        'remark' => 'DONE',
+                        'status' => 'DONE',
                         'batch' => $batch,
                         'installation_order_no' => $orderNo,
                         'installation_date' => $date_install,
@@ -71,4 +71,6 @@ class OrderImportExportController extends Controller
         $date = Carbon::now();
         return Excel::download(new ExportOrder, 'order'.$date.'.xlsx');
     }
+
+    
 }
