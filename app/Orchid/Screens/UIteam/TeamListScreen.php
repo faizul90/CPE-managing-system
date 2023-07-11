@@ -57,6 +57,7 @@ class TeamListScreen extends Screen
             ModalToggle::make(__('Add Team'))
                 ->icon('bs.plus-circle')
                 ->modal('asyncAddTeamModal')
+                ->modalTitle('Add Team')
                 ->method('saveTeam'),
         ];
     }

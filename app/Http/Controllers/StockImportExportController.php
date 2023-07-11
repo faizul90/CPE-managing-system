@@ -21,7 +21,7 @@ class StockImportExportController extends Controller
 
     public function import(Request $request)
     {
-        //try {
+        try {
             $excel = $request->file('file');
             $filePath = $excel->store('files');
 
@@ -76,10 +76,10 @@ class StockImportExportController extends Controller
             }
             Storage::delete($filePath);
             Toast::info(__('Import completed successfully!'));
-        // } catch (\Exception $e) {
-        //     Log::error($e);
-        //     Toast::error(__('Error importing file: ' . $excel->getClientOriginalName()));
-        // }
+        } catch (\Exception $e) {
+            Log::error($e);
+            Toast::error(__('Error importing file: ' . $excel->getClientOriginalName()));
+        }
 
         return redirect()->back();
     }

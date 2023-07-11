@@ -20,6 +20,7 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style;
+use Orchid\Support\Facades\Toast;
 use PhpOffice\PhpSpreadsheet\Style\Style as DefaultStyles;
 
 class ExportStock implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, ShouldAutoSize
@@ -34,38 +35,53 @@ class ExportStock implements FromCollection, WithHeadings, WithMapping, WithStyl
 
     public function collection()
     {
-        $parsedUrl = parse_url(str_replace(url('/'), '', url()->previous()));
-        $Stock = Stock::query();
-
-        if (empty($parsedUrl['query'])) {
-            $test = 'no data';
-            $Stock = $Stock->get();
-        } else {
-            $test = $parsedUrl['query'];
-
-            parse_str($test, $output);
-            if (!empty($output['filter'])) {
-                $filter = $output['filter'];
-
-                $Stock = $Stock->where(function ($query) use ($filter) {
-                    $query->where('batch', 'LIKE', '%' . ($filter['batch'] ?? '') . '%')
-                        ->where('material_no', 'LIKE', '%' . ($filter['material_no'] ?? '') . '%')
-                        ->where('description', 'LIKE', '%' . ($filter['description'] ?? '') . '%')
-                        ->where('serial_no', 'LIKE', '%' . ($filter['serial_no'] ?? '') . '%')
-                        ->where('equipment_status', 'LIKE', '%' . ($filter['equipment_status'] ?? '') . '%')
-                        ->where('valuation_type', 'LIKE', '%' . ($filter['valuation_type'] ?? '') . '%')
-                        ->where('reason', 'LIKE', '%' . ($filter['reason'] ?? '') . '%')
-                        ->where('aging', 'LIKE', '%' . ($filter['aging'] ?? '') . '%')
-                        ->where('remark', 'LIKE', '%' . ($filter['remark'] ?? '') . '%');;
-                });
-                $Stock = $Stock->select('batch','material_no','description','serial_no','equipment_status','valuation_type','reason', 'aging', 'installation_order_no', 'installation_date', 'updated_at', 'warranty_start', 'warranty_end', 'remark');
-                $Stock = $Stock->get();
+        try{
+            $parsedUrl = parse_url(str_replace(url('/'), '', url()->previous()));
+        
+            $stock = Stock::query();
+            
+            if (empty($parsedUrl['query'])) {
+                $test = 'no data';
+                $stock = $stock->get();
             } else {
-                $Stock = $Stock->get();
+                $test = $parsedUrl['query'];
+                parse_str($test, $output);
+                $filter = $output['filter'] ?? [];
+                
+                if (!empty($filter)) {
+                    $stock = $stock->where(function ($query) use ($filter) {
+                        $query->where('batch', 'LIKE', '%' . ($filter['batch'] ?? '') . '%')
+                            ->where('material_no', 'LIKE', '%' . ($filter['material_no'] ?? '') . '%')
+                            ->where('description', 'LIKE', '%' . ($filter['description'] ?? '') . '%')
+                            ->where('serial_no', 'LIKE', '%' . ($filter['serial_no'] ?? '') . '%')
+                            ->where('equipment_status', 'LIKE', '%' . ($filter['equipment_status'] ?? '') . '%')
+                            ->where('valuation_type', 'LIKE', '%' . ($filter['valuation_type'] ?? '') . '%')
+                            ->where('reason', 'LIKE', '%' . ($filter['reason'] ?? '') . '%')
+                            ->where('aging', 'LIKE', '%' . ($filter['aging'] ?? '') . '%')
+                            ->where(function ($query) use ($filter) {
+                                if(isset($filter['remark'])){
+                                    $query->where('remark', 'LIKE', '%' . ($filter['remark'] ?? '') . '%');
+                                }else{
+                                    $query->where('remark', 'LIKE', '%' .'' . '%')
+                                    ->orWhereNull('remark');
+                                }
+                                
+                            });
+                    });
+
+                    $stock = $stock->select('batch', 'material_no', 'description', 'serial_no', 'equipment_status', 'valuation_type', 'reason', 'aging', 'installation_order_no', 'installation_date', 'updated_at', 'warranty_start', 'warranty_end', 'remark')->get();
+                } else {
+                    $stock = $stock->get();
+                }
             }
+            
+            return $stock;
+        } catch (\Exception $e) {
+            Log::error($e);
+            Toast::error(__('Error exporting file'));
         }
 
-        return $Stock;
+        
     }
 
     public function map($row): array {

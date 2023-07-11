@@ -58,7 +58,6 @@ class StockListScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-            
             Link::make('Download')
                 ->icon('bs.download')
                 ->method('get')

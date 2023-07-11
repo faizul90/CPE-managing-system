@@ -56,6 +56,11 @@ class OrderListScreen extends Screen
     public function commandBar(): iterable
     {
         return [
+            ModalToggle::make(__('Add Order'))
+                ->icon('bs.plus-circle')
+                ->modal('asyncAddOrderModal')
+                ->modalTitle('Add Order')
+                ->method('saveOrder'),
             Link::make('Download')
                 ->icon('bs.download')
                 ->method('get')
@@ -81,6 +86,8 @@ class OrderListScreen extends Screen
                 ->title('Import Excel'),
             Layout::modal('asyncEditOrderModal', OrderEditLayout::class)
                 ->async('asyncGetOrderModal'),
+            Layout::modal('asyncAddOrderModal', OrderEditLayout::class)
+                ->async('asyncGetOrderModal'),
         ];
     }
 
@@ -91,9 +98,10 @@ class OrderListScreen extends Screen
         ];
     }
 
-    public function saveOrder(Request $request)
+    public function saveOrder(Request $request, WorkOrderUnifi $order)
     {
-        return OrderImportExportController::import($request->all());
+        $order->fill($request->input('order'))->save();
+        Toast::info(__('Order Updated.'));
     }
 
     public function remove(Request $request): void

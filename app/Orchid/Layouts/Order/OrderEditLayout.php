@@ -3,7 +3,9 @@
 namespace App\Orchid\Layouts\Order;
 
 use Orchid\Screen\Field;
+use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Layouts\Rows;
+
 
 class OrderEditLayout extends Rows
 {
@@ -21,6 +23,30 @@ class OrderEditLayout extends Rows
      */
     protected function fields(): iterable
     {
-        return [];
+        return [
+            Input::make('order.order_no')
+                ->type('text')
+                ->max(255)
+                ->title(__('Order No'))
+                ->placeholder(__('Order No')),
+
+            Input::make('order.team_id')
+                ->type('text')
+                ->max(255)
+                ->title(__('Team ID'))
+                ->placeholder(__('Team ID')),
+
+            Input::make('order.date_transferred')
+                ->type('text')
+                ->max(255)
+                ->title(__('Date Transferred'))
+                ->placeholder(__('Date Transferred')),
+
+            Input::make('order.transaction_type')
+                ->type('text')
+                ->max(255)
+                ->title(__('Transaction Type'))
+                ->placeholder(__('Transaction Type')),
+        ];
     }
 }

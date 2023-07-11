@@ -38,7 +38,13 @@ class OrderListLayout extends Table
                 ->sort()
                 ->cantHide()
                 ->filter(Input::make())
-                ->render(fn (WorkOrderUnifi $items) => $items->order_no),
+                ->render(fn (WorkOrderUnifi $items) => ModalToggle::make($items->order_no)
+                                ->modal('asyncEditOrderModal')
+                                ->modalTitle($items->presenter()->title())
+                                ->method('saveOrder')
+                                ->asyncParameters([
+                                    'order' => $items->id,
+                                ])),
 
             TD::make('team_id', __('Team ID'))
                 ->sort()
@@ -92,7 +98,6 @@ class OrderListLayout extends Table
                 ->render(fn (WorkOrderUnifi $items) => DropDown::make()
                     ->icon('bs.three-dots-vertical')
                     ->list([
-
                         Button::make(__('Delete'))
                             ->icon('bs.trash3')
                             ->confirm(__('Once the account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.'))
