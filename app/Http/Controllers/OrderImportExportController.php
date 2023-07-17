@@ -46,6 +46,7 @@ class OrderImportExportController extends Controller
                     $batch = $row['batch'];
                     $orderNo = $row['order_no'];
                     $date_install = Carbon::createFromFormat('dmY', $row['service_start_date'])->format('Y-m-d');
+
                 }
                 //dd($serialNumbers);
                 Stock::whereIn('serial_no', $serialNumbers)

@@ -30,7 +30,23 @@ class OrderImport implements ToModel, WithHeadingRow
         $existingOrder = WorkOrderUnifi::where('order_no', $row['order_no'])->first();
 
         if ($existingOrder) {
-            return null;
+            $existingOrder->batch = $row['batch'];
+            $existingOrder->order_no = $row['order_no'];
+            $existingOrder->team_id = $row['team_id'];
+            $existingOrder->source_system = $row['source_system'];
+            $existingOrder->transaction_type = $row['transaction_type'];
+            $existingOrder->consumption_type = $row['consumption_type'];
+            $existingOrder->exchange_code = $row['exchange_code'];
+            $existingOrder->segment_group = $row['segment_group'];
+            $existingOrder->date_transferred = $date_transferred;
+            if($existingOrder->remarks === 'What status?')
+            {
+                $existingOrder->remarks = '';
+            }else{
+                null;
+            }
+            
+            $existingOrder->save();
         }else{
             return new WorkOrderUnifi([
                 'order_no'          => $row['order_no'],

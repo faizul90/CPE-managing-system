@@ -47,7 +47,6 @@ class StockListLayouts extends Table
 
             TD::make('description', __('Description'))
                 ->sort()
-                ->cantHide()
                 ->filter(Input::make())
                 ->render(fn (Stock $stock) => $stock->description),
 

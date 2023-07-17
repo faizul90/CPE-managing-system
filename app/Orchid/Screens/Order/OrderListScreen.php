@@ -60,7 +60,7 @@ class OrderListScreen extends Screen
                 ->icon('bs.plus-circle')
                 ->modal('asyncAddOrderModal')
                 ->modalTitle('Add Order')
-                ->method('saveOrder'),
+                ->method('addOrder'),
             Link::make('Download')
                 ->icon('bs.download')
                 ->method('get')
@@ -98,10 +98,36 @@ class OrderListScreen extends Screen
         ];
     }
 
+    public function addOrder(Request $request, WorkOrderUnifi $order)
+    {
+        $orderNumber = $request->input('order.order_no');
+
+        // Check if the order number already exists
+        $existingOrder = WorkOrderUnifi::where('order_no', $orderNumber)->first();
+        if (empty($orderNumber)) {
+            Toast::error(__('Order number is required.'));
+        }else{
+            if ($existingOrder) {
+                Toast::info(__('Order Skipped. Order number already exists.'));
+            } else {
+                $order->fill($request->input('order'))->save();
+                Toast::info(__('Order Added.'));
+            }
+        }
+        
+    }
+
     public function saveOrder(Request $request, WorkOrderUnifi $order)
     {
-        $order->fill($request->input('order'))->save();
-        Toast::info(__('Order Updated.'));
+        $orderNumber = $request->input('order.order_no');
+
+        if (empty($orderNumber)) {
+            Toast::error(__('Order number is required.'));
+        }else{
+            $order->fill($request->input('order'))->save();
+            Toast::info(__('Order Updated.'));
+        }
+        
     }
 
     public function remove(Request $request): void

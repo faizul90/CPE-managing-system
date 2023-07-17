@@ -47,6 +47,9 @@ class StockImportExportController extends Controller
                     }
                     
                     $stock->batch = $row['batch'];
+                    $stock->equipment_status = $row['equipment_status'];
+                    $stock->reason = $row['reason'];
+                    $stock->valuation_type = $row['valuation_type'];
                     $stock->save();
                 }
             }

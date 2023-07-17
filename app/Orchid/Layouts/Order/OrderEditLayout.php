@@ -36,12 +36,6 @@ class OrderEditLayout extends Rows
                 ->title(__('Team ID'))
                 ->placeholder(__('Team ID')),
 
-            Input::make('order.date_transferred')
-                ->type('text')
-                ->max(255)
-                ->title(__('Date Transferred'))
-                ->placeholder(__('Date Transferred')),
-
             Input::make('order.transaction_type')
                 ->type('text')
                 ->max(255)
