@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\OrderImport;
+use App\Imports\ImportBeforeInstallOrder;
 use App\Exports\ExportOrder;
 use App\Models\WorkOrderUnifi;
+use App\Models\Unifiinstallerid;
 use App\Models\Stock;
 use Orchid\Filters;
 use Carbon\Carbon;
@@ -23,8 +25,9 @@ class OrderImportExportController extends Controller
         $excel = $request->file('file');
         
         foreach ($excel as $ex) {
-            try {
+            // try {
                 $filePath = $ex->store('files');
+                
 
                 Excel::import(new OrderImport, $filePath);
 
@@ -42,10 +45,15 @@ class OrderImportExportController extends Controller
                 $date_install = null;
 
                 foreach ($rows[0] as $row) {
-                    $serialNumbers[] = $row['serial_number'];
-                    $batch = $row['batch'];
-                    $orderNo = $row['order_no'];
-                    $date_install = Carbon::createFromFormat('dmY', $row['service_start_date'])->format('Y-m-d');
+                    if(isset($row['serial_number'])){
+                        $serialNumbers[] = $row['serial_number'];
+                        $batch = $row['batch'];
+                        $orderNo = $row['order_no'];
+                        $date_install = Carbon::createFromFormat('dmY', $row['service_start_date'])->format('Y-m-d');
+                    }else{
+                        continue;
+                    }
+                    
 
                 }
                 //dd($serialNumbers);
@@ -59,13 +67,24 @@ class OrderImportExportController extends Controller
                     ]);
                 Storage::delete($filePath);
                 Toast::info(__('Import successful: ' . $ex->getClientOriginalName()));
-            } catch (\Exception $e) {
-                // Error occurred while reading the file, display toast message
-                Toast::error(__('Error importing file: ' . $ex->getClientOriginalName()));
-            }
+            // } catch (\Exception $e) {
+            //     // Error occurred while reading the file, display toast message
+            //     Toast::error(__('Error importing file: ' . $ex->getClientOriginalName()));
+            // }
         }
 
         return redirect()->back();
+    }
+
+    public function importBefore(Request $request)
+    {
+        $excel = $request->file('file');
+        foreach ($excel as $ex) {
+            $filePath = $ex->store('files');
+            Excel::import(new ImportBeforeInstallOrder, $filePath);
+        }
+        return redirect()->back();
+
     }
 
     public function export(Request $request){

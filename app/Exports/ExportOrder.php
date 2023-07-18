@@ -86,7 +86,7 @@ class ExportOrder implements FromCollection, WithHeadings, WithMapping, WithStyl
 
     public function headings(): array
     {
-        return ["#", "Order No.", "Team ID No", "Transaction Type", "Source System", "Consumption Type", "Exchange Code", "Segment Group", "Batch", "DATE TRANSFERRED", "Remark"];
+        return ["#", "Order No.", "Team ID", "Transaction Type", "Source System", "Consumption Type", "Exchange Code", "Segment Group", "Batch", "DATE TRANSFERRED", "Remark"];
     }
 
     public function columnWidths(): array {

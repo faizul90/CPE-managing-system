@@ -65,6 +65,11 @@ class OrderListScreen extends Screen
                 ->icon('bs.download')
                 ->method('get')
                 ->route('platform.order.export'),
+            ModalToggle::make(__('Import Before Excel'))
+                ->icon('bs.plus-circle')
+                ->modal('asyncImportOrderBeforeModal')
+                ->method('post')
+                ->route('platform.order.importBefore'),
             ModalToggle::make(__('Import Excel'))
                 ->icon('bs.plus-circle')
                 ->modal('asyncImportOrderModal')
@@ -84,6 +89,8 @@ class OrderListScreen extends Screen
             OrderListLayout::class,
             Layout::modal('asyncImportOrderModal', OrderImportLayout::class)
                 ->title('Import Excel'),
+            Layout::modal('asyncImportOrderBeforeModal', OrderImportLayout::class)
+                ->title('Import Before Install Excel'),
             Layout::modal('asyncEditOrderModal', OrderEditLayout::class)
                 ->async('asyncGetOrderModal'),
             Layout::modal('asyncAddOrderModal', OrderEditLayout::class)

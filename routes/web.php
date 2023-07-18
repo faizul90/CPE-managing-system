@@ -22,4 +22,5 @@ Route::get('/', function () {
 Route::post('/import',[StockImportExportController::class, 'import'])->name('platform.store.import');
 Route::get('/export',[StockImportExportController::class, 'export'])->name('platform.store.export');
 Route::post('/order/import',[OrderImportExportController::class, 'import'])->name('platform.order.import');
+Route::post('/order/import/before',[OrderImportExportController::class, 'importBefore'])->name('platform.order.importBefore');
 Route::get('/order/export',[OrderImportExportController::class, 'export'])->name('platform.order.export');

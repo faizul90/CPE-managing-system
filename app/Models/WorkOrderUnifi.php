@@ -26,7 +26,19 @@ class Workorderunifi extends Model
         'segment_group',
         'batch',
         'remarks',
+        'planned_start',
+        'account_name',
+        'platform',
+        'location_dp',
+        'type',
+        'status',
+        'assignment_type',
+        'order_status',
+        'created',
+        'product_name',
+        'segment_sub_group',
     ];
+            
 
     protected $allowedFilters = [
         'id'                => Where::class,
@@ -40,6 +52,17 @@ class Workorderunifi extends Model
         'segment_group'     => Like::class,
         'batch'             => Like::class,
         'remarks'           => Like::class,
+        'planned_start'     => WhereDateStartEnd::class,
+        'account_name'      => Like::class,
+        'platform'          => Like::class,
+        'location_dp'       => Like::class,
+        'type'              => Like::class,
+        'status'            => Like::class,
+        'assignment_type'   => Like::class,
+        'order_status'      => Like::class,
+        'created'           => Like::class,
+        'product_name'      => Like::class,
+        'segment_sub_group' => Like::class,
     ];
 
     protected $allowedSorts = [
@@ -54,6 +77,17 @@ class Workorderunifi extends Model
         'segment_group',
         'batch',
         'remarks',
+        'planned_start',
+        'account_name',
+        'platform',
+        'location_dp',
+        'type',
+        'status',
+        'assignment_type',
+        'order_status',
+        'created',
+        'product_name',
+        'segment_sub_group',
   
     ];
 

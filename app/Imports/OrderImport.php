@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class OrderImport implements ToModel, WithHeadingRow
 {
@@ -25,7 +26,7 @@ class OrderImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        $date_transferred = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date_transferred'])->format('Y-m-d H:i:s');
+        $date_transferred = $this->convertToDatabaseDateFormat($row['date_transferred']);
 
         $existingOrder = WorkOrderUnifi::where('order_no', $row['order_no'])->first();
 
@@ -38,6 +39,8 @@ class OrderImport implements ToModel, WithHeadingRow
             $existingOrder->consumption_type = $row['consumption_type'];
             $existingOrder->exchange_code = $row['exchange_code'];
             $existingOrder->segment_group = $row['segment_group'];
+            $existingOrder->status = 'Installed';
+            $existingOrder->order_status = 'Installed';
             $existingOrder->date_transferred = $date_transferred;
             if($existingOrder->remarks === 'What status?')
             {
@@ -62,5 +65,19 @@ class OrderImport implements ToModel, WithHeadingRow
             ]);
         }
         
+    }
+
+    private function convertToDatabaseDateFormat($date)
+    {
+        $date = trim($date); // Remove leading/trailing spaces
+
+        if (is_numeric($date)) {
+            return ExcelDate::excelToDateTimeObject($date)->format('Y-m-d H:i:s');
+        } elseif ($date != null) {
+            // If the date matches the 'Y-m-d H:i:s' format, return the same format
+            return $date;
+        } else {
+            return null;
+        }
     }
 }
