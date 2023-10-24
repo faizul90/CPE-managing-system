@@ -40,7 +40,7 @@ class OrderImport implements ToModel, WithHeadingRow
             $existingOrder->exchange_code = $row['exchange_code'];
             $existingOrder->segment_group = $row['segment_group'];
             $existingOrder->status = 'Installed';
-            $existingOrder->order_status = 'Installed';
+            $existingOrder->order_status = 'Completed';
             $existingOrder->date_transferred = $date_transferred;
             if($existingOrder->remarks === 'What status?')
             {

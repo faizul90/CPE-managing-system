@@ -25,7 +25,7 @@ class OrderImportExportController extends Controller
         $excel = $request->file('file');
         
         foreach ($excel as $ex) {
-            // try {
+            try {
                 $filePath = $ex->store('files');
                 
 
@@ -67,10 +67,10 @@ class OrderImportExportController extends Controller
                     ]);
                 Storage::delete($filePath);
                 Toast::info(__('Import successful: ' . $ex->getClientOriginalName()));
-            // } catch (\Exception $e) {
-            //     // Error occurred while reading the file, display toast message
-            //     Toast::error(__('Error importing file: ' . $ex->getClientOriginalName()));
-            // }
+            } catch (\Exception $e) {
+                // Error occurred while reading the file, display toast message
+                Toast::error(__('Error importing file: ' . $ex->getClientOriginalName()));
+            }
         }
 
         return redirect()->back();
@@ -82,6 +82,39 @@ class OrderImportExportController extends Controller
         foreach ($excel as $ex) {
             $filePath = $ex->store('files');
             Excel::import(new ImportBeforeInstallOrder, $filePath);
+
+            $rows = Excel::toArray(new ImportBeforeInstallOrder, $ex);
+
+            if (empty($rows[0])) {
+                // Data is null, display toast message and continue to the next file
+                Toast::warning(__('Empty file: ' . $ex->getClientOriginalName()));
+                continue;
+            }
+
+            $serialNumbers = [];
+            $batch = null;
+            $orderNo = null;
+
+            foreach ($rows[0] as $row) {
+                if(isset($row['serial_number'])){
+                    $serialNumbers[] = $row['serial_number'];
+                    $batch = $row['batch'];
+                    $orderNo = $row['order_no'];
+                }else{
+                    continue;
+                }
+                
+
+            }
+            //dd($serialNumbers);
+            Stock::whereIn('serial_no', $serialNumbers)
+                ->update([
+                    'equipment_status' => 'INSTALLED',
+                    'status' => 'DONE',
+                    'batch' => $batch,
+                    'installation_order_no' => $orderNo,
+                ]);
+            Storage::delete($filePath);
         }
         return redirect()->back();
 

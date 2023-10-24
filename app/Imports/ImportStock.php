@@ -27,27 +27,33 @@ class ImportStock implements ToModel, WithHeadingRow
     // }
     public function model(array $row)
     {
+        
+        $aging = 'NEW';
+
         $warranty_start = $this->convertToDatabaseDateFormat($row['warranty_start_date']);
         $warranty_end = $this->convertToDatabaseDateFormat($row['warranty_end_date']);
-        $today = Carbon::today()->subMonths(3)->toDateString();
-        $today2 = Carbon::today()->subMonths(7)->toDateString();
-
-        if ($warranty_start < $today) {
-            $aging = ($warranty_start < $today2) ? 'AGING 7 MONTH' : 'AGING 3 MONTH';
-        } else {
-            $aging = 'NEW';
-        }
-
         $currentTime = Carbon::now();
 
         $existingStock = Stock::where('serial_no', $row['serial_no'])->first();
         
         if ($existingStock) {
+            $today = Carbon::today()->subMonths(3)->toDateString();
+            $today2 = Carbon::today()->subMonths(7)->toDateString();
+            $today3 = Carbon::today()->subMonths(12)->toDateString();
+
+            if ($warranty_start < $today) {
+                $aging = 'AGING 3 MONTH';
+            } if ($warranty_start < $today2) {
+                $aging = 'AGING 7 MONTH';
+            } if ($warranty_start < $today3) {
+                $aging = 'AGING 1 YEAR';
+            }
             
             $existingStockWarrantyStart = $this->convertToDatabaseDateFormat($existingStock->warranty_start);
             $existingStockWarrantyEnd = $this->convertToDatabaseDateFormat($existingStock->warranty_end);
             $existingStock->updated_at = $currentTime;
             $existingStock->batch = $row['batch'];
+            $existingStock->aging = $aging;
 
             if ($existingStockWarrantyStart === $warranty_start && $existingStockWarrantyEnd === $warranty_end && $row['remark'] = '') {
                 return null; // Skip insertion if the date values are the same as in the database
@@ -76,6 +82,7 @@ class ImportStock implements ToModel, WithHeadingRow
                 'remark' => '',
             ]);
         }
+        dd();
     }
 
     private function convertToDatabaseDateFormat($date)
